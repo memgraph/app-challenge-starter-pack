@@ -1,5 +1,7 @@
 # Memgraph App Challenge - Starter Pack
 
+![Demo App](https://public-assets.memgraph.com/app-challenge-starter-pack/demo.png)
+
 A Python starter pack for building applications with Memgraph.
 
 If you want to build a graph application with streaming data and Kafka, check out the **[Example Streaming App](https://github.com/memgraph/example-streaming-app)**.
