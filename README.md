@@ -1,6 +1,26 @@
 # Memgraph App Challenge - Starter Pack
 
-![Demo App](https://public-assets.memgraph.com/app-challenge-starter-pack/demo.png)
+<p align="center">
+  <a href="https://www.linkedin.com/company/memgraph">
+    <img src="https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn"/>
+  </a>
+  <a href="https://memgr.ph/join-discord">
+    <img src="https://img.shields.io/badge/Discord-7289DA?style=for-the-badge&logo=discord&logoColor=white" alt="Discord"/>
+  </a>
+  <a href="https://twitter.com/memgraphdb">
+    <img src="https://img.shields.io/badge/Twitter-1DA1F2?style=for-the-badge&logo=twitter&logoColor=white" alt="Twitter"/>
+  </a>
+</p>
+
+<p align="center">
+  <img src="https://public-assets.memgraph.com/app-challenge-starter-pack/demo.png" width="600"/>
+</p>
+
+<p align="center">
+  <a href="https://github.com/memgraph/memgraph-platform/LICENSE">
+    <img src="https://img.shields.io/github/license/g-despot/app-challenge-starter-pack.svg" alt="license"/>
+  </a>
+</p>
 
 A Python starter pack for building applications with Memgraph.
 
