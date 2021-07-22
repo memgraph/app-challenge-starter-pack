@@ -85,6 +85,7 @@ def load_data():
     """Load data into the database."""
 
     try:
+        memgraph.drop_database()
         path = Path("/usr/lib/memgraph/import-data/karate_club.csv")
 
         memgraph.execute_query(
