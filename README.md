@@ -22,9 +22,28 @@
   </a>
 </p>
 
-A Python starter pack for building applications with Memgraph.
+## The application
+
+A Python starter pack for building streaming applications with Memgraph.
+The app consists of three components:
+* **server**: A Flask Python server that loads the initial data into Memgraph and fetches the graph to visualize it.
+* **stream**: A service that sends data to the Kafka cluster.
+* **Memgraph**: The graph platform that receives data from Kafka.
 
 If you want to build a graph application with streaming data and Kafka, check out the **[Example Streaming App](https://github.com/memgraph/example-streaming-app)**.
+
+## Starting the app
+
+You can start the app by running:
+```
+docker-compose build
+docker compose up server
+```
+
+The `stream` service that sends data to Kafka can be started with:
+```
+docker compose up stream
+```
 
 ## Documentation
 
