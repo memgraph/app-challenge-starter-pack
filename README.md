@@ -37,12 +37,12 @@ If you want to build a graph application with streaming data and Kafka, check ou
 You can start the app by running:
 ```
 docker-compose build
-docker compose up server
+docker-compose up server
 ```
 
 The `stream` service that sends data to Kafka can be started with:
 ```
-docker compose up stream
+docker-compose up stream
 ```
 
 ## Documentation
