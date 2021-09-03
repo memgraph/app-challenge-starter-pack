@@ -1,11 +1,18 @@
-import logging
+import database
 import json
+import logging
+import os
 import time
-from pathlib import Path
 from argparse import ArgumentParser
-from functools import wraps
 from flask import Flask, Response, render_template
-from gqlalchemy import Match, Memgraph
+from functools import wraps
+
+
+KAFKA_HOST = os.getenv("KAFKA_HOST", "kafka")
+KAFKA_PORT = os.getenv("KAFKA_PORT", "9092")
+MEMGRAPH_HOST = os.getenv("MEMGRAPH_HOST", "memgraph-mage")
+MEMGRAPH_PORT = int(os.getenv("MEMGRAPH_PORT", "7687"))
+PATH_TO_INPUT_FILE = os.getenv("PATH_TO_INPUT_FILE", "/")
 
 
 log = logging.getLogger(__name__)
@@ -15,9 +22,6 @@ def init_log():
     logging.basicConfig(level=logging.DEBUG)
     log.info("Logging enabled")
     logging.getLogger("werkzeug").setLevel(logging.WARNING)
-
-
-init_log()
 
 
 def parse_args():
@@ -49,15 +53,7 @@ def parse_args():
 
 args = parse_args()
 
-memgraph = Memgraph()
-connection_established = False
-while(not connection_established):
-    try:
-        if (memgraph._get_cached_connection().is_active()):
-            connection_established = True
-    except:
-        log.info("Memgraph probably isn't running.")
-        time.sleep(4)
+memgraph = None
 
 
 app = Flask(
@@ -83,22 +79,11 @@ def log_time(func):
 @log_time
 def load_data():
     """Load data into the database."""
-
     try:
-        memgraph.drop_database()
-        path = Path("/usr/lib/memgraph/import-data/karate_club.csv")
-
-        memgraph.execute_query(
-            f"""LOAD CSV FROM "{path}"
-            WITH HEADER DELIMITER " " AS row
-            MERGE (a:Member {{id: ToInteger(row.id_1)}})
-            MERGE (b:Member {{id: ToInteger(row.id_2)}})
-            CREATE (a)-[e:FRIENDS_WITH]->(b);"""
-        )
+        memgraph.load_data_into_memgraph(PATH_TO_INPUT_FILE)
         return Response(status=200)
     except Exception as e:
-        log.info("Data loading error.")
-        log.info(e)
+        log.info(f"Data loading error: {e}")
         return Response(status=500)
 
 
@@ -107,13 +92,7 @@ def load_data():
 def get_data():
     """Load everything from the database."""
     try:
-        results = (
-            Match()
-            .node("Member", variable="from")
-            .to("FRIENDS_WITH")
-            .node("Member", variable="to")
-            .execute()
-        )
+        results = memgraph.get_graph()
 
         # Set for quickly check if we have already added the node or the edge
         nodes_set = set()
@@ -125,10 +104,8 @@ def get_data():
             nodes_set.add(source_id)
             nodes_set.add(target_id)
 
-            if (source_id, target_id) not in links_set and (
-                target_id,
-                source_id,
-            ) not in links_set:
+            if ((source_id, target_id) not in links_set and
+                    (target_id, source_id,) not in links_set):
                 links_set.add((source_id, target_id))
 
         nodes = [
@@ -138,11 +115,9 @@ def get_data():
         links = [{"source": n_id, "target": m_id} for (n_id, m_id) in links_set]
 
         response = {"nodes": nodes, "links": links}
-
         return Response(json.dumps(response), status=200, mimetype="application/json")
     except Exception as e:
-        log.info("Data fetching went wrong.")
-        log.info(e)
+        log.info(f"Data loading error: {e}")
         return ("", 500)
 
 
@@ -152,7 +127,14 @@ def index():
 
 
 def main():
-    app.run(host=args.host, port=args.port, debug=args.debug)
+    if os.environ.get("WERKZEUG_RUN_MAIN") == "true":
+        init_log()
+        global memgraph
+        memgraph = database.Memgraph(MEMGRAPH_HOST,
+                                     MEMGRAPH_PORT)
+    app.run(host=args.host,
+            port=args.port,
+            debug=args.debug)
 
 
 if __name__ == "__main__":
