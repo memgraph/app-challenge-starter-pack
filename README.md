@@ -13,7 +13,7 @@
 </p>
 
 <p align="center">
-  <img src="https://public-assets.memgraph.com/app-challenge-starter-pack/demo.png" width="600"/>
+  <img src="img/demo.png" width="600"/>
 </p>
 
 <p align="center">
